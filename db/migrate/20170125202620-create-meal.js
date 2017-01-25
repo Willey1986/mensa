@@ -1,18 +1,12 @@
 'use strict';
-
 module.exports = {
     up: function (queryInterface, Sequelize) {
         return queryInterface.createTable('Meals', {
             id: {
-                type: Sequelize.INTEGER,
+                allowNull: false,
+                autoIncrement: true,
                 primaryKey: true,
-                autoIncrement: true
-            },
-            createdAt: {
-                type: Sequelize.DATE
-            },
-            updatedAt: {
-                type: Sequelize.DATE
+                type: Sequelize.INTEGER
             },
             name: {
                 type: Sequelize.STRING
@@ -31,10 +25,17 @@ module.exports = {
             },
             price_guest: {
                 type: Sequelize.DECIMAL(10, 2)
+            },
+            createdAt: {
+                allowNull: false,
+                type: Sequelize.DATE
+            },
+            updatedAt: {
+                allowNull: false,
+                type: Sequelize.DATE
             }
         });
     },
-
     down: function (queryInterface, Sequelize) {
         return queryInterface.dropTable('Meals');
     }
