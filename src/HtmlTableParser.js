@@ -38,35 +38,37 @@ module.exports = {
             return array.length > 0;
         });
 
-        return {
-            date: this.parseDate(rows[0][0]),
-            meals: this.parseMeals(rows.slice(1))
-        };
+        var date = this.parseDate(rows[0][0]);
+        return this.parseMeals(rows.slice(1), date);
     },
 
     parseDate: function (dateString) {
         var dateAsString = dateString.split(" – ")[0].split(", ")[1];
         var timeOfDay = dateString.split(" – ")[1];
-        var dayNumber = dateAsString.split(" ")[0].replace(/\./, "");
-        var monthNumber = this.months.get(dateAsString.split(" ")[1]);
-        var yearNumber = dateAsString.split(" ")[2];
+        var dayNumber = parseInt(dateAsString.split(" ")[0].replace(/\./, ""));
+        var monthNumber = this.months.get(dateAsString.split(" ")[1]) - 1;
+        var yearNumber = parseInt(dateAsString.split(" ")[2]);
 
-        var date = new Date(yearNumber, monthNumber, dayNumber);
+
+        var date = new Date(yearNumber, monthNumber, dayNumber + 1);
 
         return {
             date: date,
-            timeOfDay: timeOfDay
+            timeOfDay: timeOfDay.charAt(0)
         }
     },
 
-    parseMeals: function (meals) {
+
+    parseMeals: function (meals, date) {
         return meals.toArray().map(function (meal) {
             return {
                 type: meal[0],
                 name: meal[1],
                 priceStudent: meal[2],
                 priceStaff: meal[3],
-                priceGuest: meal[4]
+                priceGuest: meal[4],
+                date: date.date,
+                timeOfDay: date.timeOfDay
             }
         });
     },
@@ -83,11 +85,17 @@ module.exports = {
 
     parseCell: function (index, cell) {
         var $ = cheerio.load(cell);
-        return $.text();
+        var s = $.text().trim().replace(/€/, "").trim();
+
+        if (/[0-9],[0-9]/.test(s)) {
+            return parseFloat(s.replace(",", "."));
+        }
+
+        return s;
     },
 
     stringNotEmpty: function (index, string) {
-        return !!string.trim()
+        return !!string
     }
 
 };

@@ -5,7 +5,7 @@ var fs = require("fs");
 describe("HtmlTableParser", function () {
 
     beforeEach(function () {
-        var fileToRead = "test/resources/speiseplan_mensa_1.html";
+        var fileToRead = "test/resources/speiseplan_mensa_1_v2.html";
         this.html = fs.readFileSync(fileToRead, "utf8");
         this.parser = htmlTableParser;
     });

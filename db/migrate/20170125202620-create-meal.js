@@ -8,6 +8,9 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
+            type: {
+                type: Sequelize.STRING
+            },
             name: {
                 type: Sequelize.STRING
             },
@@ -15,7 +18,7 @@ module.exports = {
                 type: Sequelize.DATEONLY
             },
             time_of_day: {
-                type: Sequelize.ENUM('noon', 'evening')
+                type: Sequelize.ENUM('M', 'A')
             },
             price_student: {
                 type: Sequelize.DECIMAL(10, 2)
