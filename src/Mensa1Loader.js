@@ -1,5 +1,5 @@
-var parser = require('./HtmlTableParser');
-var rq = require('request-promise');
+let parser = require('./HtmlTableParser');
+let rq = require('request-promise');
 
 module.exports = {
 

@@ -1,4 +1,4 @@
-var cheerio = require("cheerio");
+const cheerio = require("cheerio");
 
 module.exports = {
 
@@ -24,33 +24,41 @@ module.exports = {
 
     },
 
-    parse: function (html) {
-        var $ = cheerio.load(html);
-        var tables = $("table");
 
-        var result = tables.map(this.parseTable.bind(this)).toArray();
-        return result;
+    getTableElements(html) {
+        const $ = cheerio.load(html);
+        return $('table');
+    },
+
+    getTableRows(table) {
+        const $ = cheerio.load(table);
+        return $('tr');
+    },
+
+    parse: function (html) {
+        return this.getTableElements(html)
+            .map(this.parseTable.bind(this))
+            .toArray();
     },
 
     parseTable: function (index, table) {
-        var $ = cheerio.load(table);
-        var rows = $("tr").map(this.parseRow.bind(this)).filter(function (index, array) {
-            return array.length > 0;
-        });
+        const rows = this.getTableRows(table)
+            .map(this.parseRow.bind(this))
+            .filter((index, array) => array.length > 0);
 
-        var date = this.parseDate(rows[0][0]);
+        const date = this.parseDate(rows[0][0]);
         return this.parseMeals(rows.slice(1), date);
     },
 
     parseDate: function (dateString) {
-        var dateAsString = dateString.split(" – ")[0].split(", ")[1];
-        var timeOfDay = dateString.split(" – ")[1];
-        var dayNumber = parseInt(dateAsString.split(" ")[0].replace(/\./, ""));
-        var monthNumber = this.months.get(dateAsString.split(" ")[1]) - 1;
-        var yearNumber = parseInt(dateAsString.split(" ")[2]);
+        const dateAsString = dateString.split(" – ")[0].split(", ")[1];
+        const timeOfDay = dateString.split(" – ")[1];
+        const dayNumber = parseInt(dateAsString.split(" ")[0].replace(/\./, ""));
+        const monthNumber = this.months.get(dateAsString.split(" ")[1]) - 1;
+        const yearNumber = parseInt(dateAsString.split(" ")[2]);
 
 
-        var date = new Date(yearNumber, monthNumber, dayNumber + 1);
+        const date = new Date(yearNumber, monthNumber, dayNumber + 1);
 
         return {
             date: date,
@@ -63,7 +71,7 @@ module.exports = {
         return meals.toArray().map(function (meal) {
             return {
                 type: meal[0],
-                name: meal[1],
+                name: meal[1].replace(/\s\s+/g, ' '),
                 priceStudent: meal[2],
                 priceStaff: meal[3],
                 priceGuest: meal[4],
@@ -74,9 +82,9 @@ module.exports = {
     },
 
     parseRow: function (index, row) {
-        var $ = cheerio.load(row);
-        var headerCells = $("th");
-        var defaultCells = $("td");
+        const $ = cheerio.load(row);
+        const headerCells = $("th");
+        const defaultCells = $("td");
 
         return headerCells.length !== 0
             ? headerCells.map(this.parseCell).filter(this.stringNotEmpty)
@@ -84,8 +92,8 @@ module.exports = {
     },
 
     parseCell: function (index, cell) {
-        var $ = cheerio.load(cell);
-        var s = $.text().trim().replace(/€/, "").trim();
+        const $ = cheerio.load(cell);
+        const s = $.text().trim().replace(/€/, "").trim();
 
         if (/[0-9],[0-9]/.test(s)) {
             return parseFloat(s.replace(",", "."));
